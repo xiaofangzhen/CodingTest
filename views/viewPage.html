@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Page</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+    <style type="text/css">
+        .table-info{
+        }
+        ul li{
+            list-style: none;
+        }
+        ul li ul{
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+        }
+        ul li ul li{
+            list-style: none;
+            text-align: left;
+            width: 280px;
+            line-height: 30px;
+        }
+    </style>
+</head>
+<body>
+<div id="nav">
+    <ul >
+        <li ><a href="newPage">新增</a></li>
+        <li ><a href="viewPage">列表</a></li>
+    </ul>
+</div>
+<div style="text-align: center">
+    <ul id="fileList">
+        <li>
+            <ul>
+                <li>
+                    <label class="table-info">文件名</label>
+                </li>
+                <li>
+                    <label class="table-info">创建时间</label>
+                </li>
+                <li>
+                    <label class="table-info">最后更新时间</label>
+                </li>
+                <li>
+                    <label>编辑</label>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<script>
+    function editFile() {
+        console.log(this.parentNode.parentNode.children[0].id)
+        window.location = "/editPage?id=" + this.parentNode.parentNode.children[0].id;
+    }
+    $(document).ready(function() {
+        $.ajax({
+            url: "/getFileList",
+            type: "GET",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                if(data.ok){
+                    console.log(data)
+                    const fileList = $('#fileList').get(0)
+                    data.data.forEach(
+                        info => {
+                            const ul = document.createElement('ul');
+                            const li = document.createElement('li');
+                            const li1 = document.createElement('li');
+                            const li2 = document.createElement('li');
+                            const li3 = document.createElement('li');
+                            const li4 = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = "/download?id=" + info.id;
+                            li1.id = info.id;
+                            const span = document.createElement('span')
+                            span.innerHTML = info.original_name
+                            a.appendChild(span)
+                            a.classList.add('table-info')
+                            ul.appendChild(li1);
+                            li1.appendChild(a);
+                            li.appendChild(ul);
+                            const createTime = document.createElement('label')
+                            createTime.classList.add('table-info')
+                            createTime.innerHTML = info.create_time
+                            li2.appendChild(createTime);
+                            const updateTime = document.createElement('label')
+                            updateTime.classList.add('table-info')
+                            updateTime.innerHTML = info.update_time;
+                            li3.appendChild(updateTime)
+                            const editButton = document.createElement('button')
+                            editButton.innerHTML = 'Edit'
+                            editButton.onclick = editFile;
+                            li4.appendChild(editButton);
+                            ul.appendChild(li2);
+                            ul.appendChild(li3);
+                            ul.appendChild(li4);
+                            fileList.appendChild(li);
+                    })
+                }else{
+                    alert(data.err);
+                }
+            },
+            error:function (err) {
+                alert(err);
+            }
+        });
+    })
+</script>
+</body>
+</html>

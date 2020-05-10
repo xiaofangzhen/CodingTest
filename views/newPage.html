@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>New Page</title>
+    <script src="js/jquery-3.5.1.min.js"></script>
+</head>
+<body>
+<div id="nav">
+    <ul >
+        <li ><a href="newPage">新增</a></li>
+        <li ><a href="viewPage">列表</a></li>
+    </ul>
+</div>
+<div style="text-align: center">
+    <div style="margin-bottom: 20px">
+        <label>File Name:</label>
+        <input id="fileName" type="text" onchange="onFileNameChange()">
+    </div>
+    <div style="margin-bottom: 20px">
+        <label>File Content:</label>
+        <textarea id="content" cols="30" rows="30" onchange="onContentChange()"></textarea>
+    </div>
+    <button onclick="submitFile()">
+        Save
+    </button>
+</div>
+
+<script>
+    function submitFile() {
+        var fileName = $('#fileName').val();
+        var content = $('#content').val();
+        $.ajax({
+            url: "/saveFile",
+            data: {fileName: fileName,content:content},
+            type: "POST",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                if(data.ok){
+                    alert("save success");
+                }else{
+                    alert(data.err);
+                }
+            },
+            error:function (err) {
+                alert(err);
+            }
+        });
+    }
+
+    function onContentChange() {
+        localStorage.setItem('content',$('#content').val());
+    }
+
+    function onFileNameChange() {
+        localStorage.setItem('fileName',$('#fileName').val());
+    }
+    function loadData() {
+        var fileName = localStorage.getItem('fileName');
+        $('#fileName').val(fileName);
+        var content = localStorage.getItem('content');
+        $('#content').val(content);
+    }
+    $(document).ready(function() {
+        loadData();
+    })
+</script>
+</body>
+</html>
