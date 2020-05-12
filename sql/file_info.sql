@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50718
 File Encoding         : 65001
 
-Date: 2020-05-11 01:53:42
+Date: 2020-05-13 01:03:21
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -20,12 +20,13 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 DROP TABLE IF EXISTS `file_info`;
 CREATE TABLE `file_info` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `original_name` varchar(255) DEFAULT NULL,
-  `full_name` varchar(255) DEFAULT NULL,
-  `file_status` tinyint(4) DEFAULT NULL,
-  `version` int(11) DEFAULT '0',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '唯一自增ID',
+  `original_name` varchar(255) DEFAULT NULL COMMENT '文件名字',
+  `full_name` varchar(255) DEFAULT NULL COMMENT '文件保存在服务器上的全路径名称',
+  `file_status` tinyint(4) DEFAULT '0' COMMENT '文件状态：0正常；1锁定',
+  `version` int(11) DEFAULT '0' COMMENT '文档版本',
+  `user_ip` varchar(255) DEFAULT NULL COMMENT '当前锁定的用户ip',
+  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '文件创建时间',
+  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '文件最后更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4;

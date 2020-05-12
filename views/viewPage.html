@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>New Page</title>
+    <title>View Page</title>
     <script src="js/jquery-3.5.1.min.js"></script>
     <style type="text/css">
         .table-info{
@@ -21,11 +21,23 @@
             width: 280px;
             line-height: 30px;
         }
+        .tab{
+            display: flex;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            margin-left: 50px;
+        }
+        .tab li{
+            width: 50px;
+        }
+        .tab li a{
+            text-decoration-line: none;
+        }
     </style>
 </head>
 <body>
 <div id="nav">
-    <ul >
+    <ul class="tab">
         <li ><a href="newPage">新增</a></li>
         <li ><a href="viewPage">列表</a></li>
     </ul>
@@ -33,7 +45,7 @@
 <div style="text-align: center">
     <ul id="fileList">
         <li>
-            <ul>
+            <ul style="margin-bottom: 16px">
                 <li>
                     <label class="table-info">文件名</label>
                 </li>
@@ -54,8 +66,26 @@
 <script>
     function editFile() {
         console.log(this.parentNode.parentNode.children[0].id)
-        window.location = "/editPage?id=" + this.parentNode.parentNode.children[0].id;
+        $.ajax({
+            url: "/lockFile",
+            data: {id: this.parentNode.parentNode.children[0].id},
+            type: "POST",
+            dataType: "json",
+            success: function(data) {
+                console.log(data);
+                if(data.ok){
+                    window.location = "/editPage?id=" + data.id;
+                }else{
+                    alert(data.err);
+                }
+            },
+            error:function (err) {
+                console.log(err)
+                alert(err);
+            }
+        });
     }
+
     $(document).ready(function() {
         $.ajax({
             url: "/getFileList",
