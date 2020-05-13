@@ -27,7 +27,7 @@
 <div id="nav">
     <ul class="tab">
         <li ><a href="newPage">新增</a></li>
-        <li ><a href="viewPage">列表</a></li>
+        <li ><a href="viewPage?pageNo=1">列表</a></li>
     </ul>
 </div>
 <div style="text-align: center;display: table;width: 900px;margin-left: 100px">
@@ -52,7 +52,7 @@
             console.log("ajaxSubmit")
             if (data.ok){
                 console.log(data)
-                window.location = "/viewPage";
+                window.location = "/viewPage?pageNo=1";
             }else{
                 alert(data.err);
             }
@@ -72,7 +72,7 @@
                     $('#id').val(data.id)
                 }else{
                     alert(data.err);
-                    window.location = "/viewPage"
+                    window.location = "/viewPage?pageNo=1"
                 }
             },
             error:function (err) {

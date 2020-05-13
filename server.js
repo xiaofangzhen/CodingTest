@@ -41,17 +41,35 @@ app.post('/saveFile', async (req, res) => {
     })
 })
 app.get('/getFileList', async (req, res) => {
-    let sql = "SELECT * FROM file_info";
-    db.getConnect().query(sql,(err,result) => {
+    let pageNo = req.query.pageNo;
+    console.log(req.query)
+    if(pageNo == null || parseInt(pageNo) < 0){
+        pageNo = 1;
+    }
+    let start = (pageNo - 1)* 10;
+    console.log(start)
+    let sqlCount = "SELECT COUNT(*) AS num FROM file_info";
+    db.getConnect().query(sqlCount,(err,result) => {
         if(err){
             console.log(`SQL error: ${err}!`);
             return res.status(500).send({err:err});
         }else{
-            console.log(result);
-            return res.status(200).send({ok:true,data:result});
+            // console.log(result);
+            var totalCount = result[0].num;
+            let sql = "SELECT * FROM file_info ORDER BY id LIMIT ?,10";
+            db.getConnect().query(sql,[start],(err,result) => {
+                if(err){
+                    console.log(`SQL error: ${err}!`);
+                    return res.status(500).send({err:err});
+                }else{
+                    // console.log(result);
+                    return res.status(200).send({ok:true,data:result,total:Math.ceil(totalCount/10)});
+                }
+            })
         }
     })
 })
+
 app.get('/download', async (req, res) => {
     let id = req.query.id;
     let sql = "SELECT * FROM file_info WHERE id = ?";

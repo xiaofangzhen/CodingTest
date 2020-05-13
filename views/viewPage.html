@@ -33,13 +33,26 @@
         .tab li a{
             text-decoration-line: none;
         }
+        .page{
+            text-align: center;
+            margin-top: 50px;
+        }
+        .page a,.page span{
+            text-decoration: none;
+            padding: 5px 7px;
+            color: #767675;
+            cursor: pointer;
+        }
+        .page a:hover,.page span:hover{
+            color: red;
+        }
     </style>
 </head>
 <body>
 <div id="nav">
     <ul class="tab">
         <li ><a href="newPage">新增</a></li>
-        <li ><a href="viewPage">列表</a></li>
+        <li ><a href="viewPage?pageNo=1">列表</a></li>
     </ul>
 </div>
 <div style="text-align: center">
@@ -61,6 +74,10 @@
             </ul>
         </li>
     </ul>
+</div>
+
+<div class="page" id="page">
+
 </div>
 
 <script>
@@ -86,51 +103,91 @@
         });
     }
 
+    function rendList(data) {
+        const fileList = $('#fileList').get(0)
+        data.forEach(
+            info => {
+                const ul = document.createElement('ul');
+                const li = document.createElement('li');
+                const li1 = document.createElement('li');
+                const li2 = document.createElement('li');
+                const li3 = document.createElement('li');
+                const li4 = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = "/download?id=" + info.id;
+                li1.id = info.id;
+                const span = document.createElement('span')
+                span.innerHTML = info.original_name
+                a.appendChild(span)
+                a.classList.add('table-info')
+                ul.appendChild(li1);
+                li1.appendChild(a);
+                li.appendChild(ul);
+                const createTime = document.createElement('label')
+                createTime.classList.add('table-info')
+                createTime.innerHTML = info.create_time
+                li2.appendChild(createTime);
+                const updateTime = document.createElement('label')
+                updateTime.classList.add('table-info')
+                updateTime.innerHTML = info.update_time;
+                li3.appendChild(updateTime)
+                const editButton = document.createElement('button')
+                editButton.innerHTML = 'Edit'
+                editButton.onclick = editFile;
+                li4.appendChild(editButton);
+                ul.appendChild(li2);
+                ul.appendChild(li3);
+                ul.appendChild(li4);
+                fileList.appendChild(li);
+        })
+    }
+
+    function rendPageIndex(pageNumber,total) {
+        const page = $('#page').get(0)
+        const firstPage = document.createElement('a');
+        firstPage.href = "/viewPage?pageNo=1";
+        firstPage.innerHTML = "第一页"
+        page.appendChild(firstPage);
+        pageNumber.forEach((pno) => {
+            const a = document.createElement('a');
+            a.href = "/viewPage?pageNo=" + pno;
+            a.innerHTML = pno
+            page.appendChild(a);
+        })
+        const lastPage = document.createElement('a');
+        lastPage.href = "/viewPage?pageNo=" + total;
+        lastPage.innerHTML = "最后一页"
+        page.appendChild(lastPage);
+    }
+
     $(document).ready(function() {
+        var curPageNo = 1 ;
+        if (window.location.search){
+            var no = window.location.search.substr(1).split("=");
+            curPageNo = parseInt(no[1]);
+        }
         $.ajax({
-            url: "/getFileList",
+            url: "/getFileList" + window.location.search,
             type: "GET",
             dataType: "json",
             success: function(data) {
                 console.log(data);
                 if(data.ok){
                     console.log(data)
-                    const fileList = $('#fileList').get(0)
-                    data.data.forEach(
-                        info => {
-                            const ul = document.createElement('ul');
-                            const li = document.createElement('li');
-                            const li1 = document.createElement('li');
-                            const li2 = document.createElement('li');
-                            const li3 = document.createElement('li');
-                            const li4 = document.createElement('li');
-                            const a = document.createElement('a');
-                            a.href = "/download?id=" + info.id;
-                            li1.id = info.id;
-                            const span = document.createElement('span')
-                            span.innerHTML = info.original_name
-                            a.appendChild(span)
-                            a.classList.add('table-info')
-                            ul.appendChild(li1);
-                            li1.appendChild(a);
-                            li.appendChild(ul);
-                            const createTime = document.createElement('label')
-                            createTime.classList.add('table-info')
-                            createTime.innerHTML = info.create_time
-                            li2.appendChild(createTime);
-                            const updateTime = document.createElement('label')
-                            updateTime.classList.add('table-info')
-                            updateTime.innerHTML = info.update_time;
-                            li3.appendChild(updateTime)
-                            const editButton = document.createElement('button')
-                            editButton.innerHTML = 'Edit'
-                            editButton.onclick = editFile;
-                            li4.appendChild(editButton);
-                            ul.appendChild(li2);
-                            ul.appendChild(li3);
-                            ul.appendChild(li4);
-                            fileList.appendChild(li);
-                    })
+                    rendList(data.data)
+                    var pageList = [];
+                    if (curPageNo > 1){
+                        pageList.push(curPageNo - 1)
+                    }
+                    pageList.push(curPageNo)
+                    if (curPageNo + 1 <= data.total){
+                        pageList.push(curPageNo + 1);
+                    }
+                    if (pageList.length < 3 && curPageNo + 2 <= data.total){
+                        pageList.push(curPageNo + 2);
+                    }
+                    rendPageIndex(pageList,data.total);
+
                 }else{
                     alert(data.err);
                 }
